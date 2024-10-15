@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.Objects;
-
 public class Main {
 
     public static void main(String[] args) {
@@ -61,7 +58,7 @@ public class Main {
         task1.setStatus(Status.IN_PROGRESS);
         subTask2.setStatus(Status.DONE, epic1);
 
-        taskManager.removeSubTaskById(epic2.getSubTasks().get(0).getId(), epic2);
+        taskManager.removeSubTaskById(epic2.getSubTasks().getFirst().getId(), epic2);
 
         System.out.println("Задача 1");
         System.out.println(task1);

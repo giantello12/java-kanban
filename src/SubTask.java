@@ -12,11 +12,7 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask{" +
-                " title='" + getTitle() + '\'' +
-                " description='" + getDescription() + '\'' +
-                " id=" + id +
-                '}';
+        return "SubTask{" + " title='" + getTitle() + '\'' + " description='" + getDescription() + '\'' + " id=" + id + '}';
     }
 
     protected void setStatus(Status status, Epic epic) {

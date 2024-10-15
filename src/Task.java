@@ -37,8 +37,12 @@ public class Task {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) { return true; }
-        if (obj.getClass() != this.getClass()) { return false; }
+        if (this == obj) {
+            return true;
+        }
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
         Task otherTask = (Task) obj;
         return id == otherTask.id;
     }
@@ -50,10 +54,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task {" +
-                "title='" + title + '\'' +
-                " description='" + description + '\'' +
-                " id=" + id +
-                '}';
+        return "Task {" + "title='" + title + '\'' + " description='" + description + '\'' + " id=" + id + '}';
     }
 }
