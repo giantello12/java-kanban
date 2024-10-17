@@ -1,6 +1,7 @@
 package ru.yandex.javacource.sevrin.schedule.manager;
 
 import ru.yandex.javacource.sevrin.schedule.task.Epic;
+import ru.yandex.javacource.sevrin.schedule.task.Status;
 import ru.yandex.javacource.sevrin.schedule.task.Subtask;
 import ru.yandex.javacource.sevrin.schedule.task.Task;
 
@@ -37,15 +38,20 @@ public class TaskManager {
         subtasks.clear();
     }
 
-    public void deleteAllTasks() {
+    public void deleteTasks() {
         tasks.clear();
     }
 
-    public void deleteAllSubtasks() {
+    public void deleteSubtasks() {
+        for (Epic epic : epics.values()) {
+            epic.cleanSubtaskIds();
+            updateEpicStatus(epic.getId());
+        }
         subtasks.clear();
     }
 
-    public void deleteAllEpics() {
+    public void deleteEpics() {
+        subtasks.clear();
         epics.clear();
     }
 
@@ -61,35 +67,16 @@ public class TaskManager {
         return subtasks.get(id);
     }
 
-    public Status getTaskStatus(int id) {
-        if (tasks.get(id) == null) {
+    public ArrayList<Subtask> getEpicSubtasks(int epicId) {
+        ArrayList<Subtask> tasks = new ArrayList<>();
+        Epic epic = epics.get(epicId);
+        if (epic == null) {
             return null;
         }
-        return tasks.get(id).getStatus();
-    }
-
-    public Status getEpicStatus(int id) {
-        if (epics.get(id) == null) {
-            return null;
+        for (int id : epic.getSubtasksIds()) {
+            tasks.add(subtasks.get(id));
         }
-        return epics.get(id).getStatus();
-    }
-
-    public Status getSubtaskStatus(int id) {
-        if (subtasks.get(id) == null) {
-            return null;
-        }
-        return subtasks.get(id).getStatus();
-    }
-
-    public void setTaskStatus(int id, Status status) {
-        tasks.get(id).setStatus(status);
-    }
-
-    public void setSubtaskStatus(int id, Status status) {
-        Subtask subtask = subtasks.get(id);
-        subtask.setStatus(status);
-        updateEpicStatus(subtask.getEpicId());
+        return tasks;
     }
 
     public int addTask(Task task) {
@@ -120,32 +107,37 @@ public class TaskManager {
         return id;
     }
 
-    public void updateTask(Task task, String title, String description) {
+    public void updateTask(Task task) {
         int id = task.getId();
         Task savedTask = tasks.get(id);
         if (savedTask == null) {
             return;
         }
-        savedTask.setTitle(title);
-        savedTask.setDescription(description);
+        tasks.put(id, task);
     }
 
-    public void updateEpic(Epic epic, String title, String description) {
-        Epic savedEpic = epics.get(epic.getId());
+    public void updateEpic(Epic epic) {
+        int id = epic.getId();
+        Epic savedEpic = epics.get(id);
         if (savedEpic == null) {
             return;
         }
-        savedEpic.setTitle(title);
-        savedEpic.setDescription(description);
+        epics.put(id, epic);
     }
 
-    public void updateSubtask(Subtask subtask, String title, String description) {
-        Subtask savedSubtask = subtasks.get(subtask.getId());
+    public void updateSubtask(Subtask subtask) {
+        final int id = subtask.getId();
+        final int epicId = subtask.getEpicId();
+        final Subtask savedSubtask = subtasks.get(id);
         if (savedSubtask == null) {
             return;
         }
-        savedSubtask.setTitle(title);
-        savedSubtask.setDescription(description);
+        final Epic epic = epics.get(epicId);
+        if (epic == null) {
+            return;
+        }
+        subtasks.put(id, subtask);
+        updateEpicStatus(epicId);
     }
 
     public void deleteTask(int id) {
@@ -172,7 +164,7 @@ public class TaskManager {
         updateEpicStatus(epic.getId());
     }
 
-    public void updateEpicStatus(int epicId) {
+    private void updateEpicStatus(int epicId) {
         int doneCounter = 0;
         Epic epic = epics.get(epicId);
         for (Integer subtaskId : epic.getSubtasksIds()) {

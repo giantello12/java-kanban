@@ -1,7 +1,5 @@
 package ru.yandex.javacource.sevrin.schedule.task;
 
-import ru.yandex.javacource.sevrin.schedule.manager.Status;
-
 import java.util.Objects;
 
 public class Task {

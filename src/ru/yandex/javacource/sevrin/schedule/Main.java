@@ -1,10 +1,11 @@
 package ru.yandex.javacource.sevrin.schedule;
 
-import ru.yandex.javacource.sevrin.schedule.manager.Status;
+import ru.yandex.javacource.sevrin.schedule.task.Status;
 import ru.yandex.javacource.sevrin.schedule.manager.TaskManager;
 import ru.yandex.javacource.sevrin.schedule.task.Epic;
 import ru.yandex.javacource.sevrin.schedule.task.Subtask;
 import ru.yandex.javacource.sevrin.schedule.task.Task;
+
 
 public class Main {
 
@@ -30,46 +31,50 @@ public class Main {
         int idSubtask3 = taskManager.addSubtask(subtask3);
 
         System.out.println("Задача 1\n" + taskManager.getTask(idTask1)
-                + "\nСтатус " + taskManager.getTaskStatus(idTask1));
+                + "\nСтатус " + task1.getStatus());
         System.out.println("Задача2\n" + taskManager.getTask(idTask2)
-                + "\nСтатус " + taskManager.getTaskStatus(idTask2));
+                + "\nСтатус " + task2.getStatus());
         System.out.println("Эпик 1\n" + taskManager.getEpic(idEpic1)
-                + "\nСтатус " + taskManager.getEpicStatus(idEpic1));
+                + "\nСтатус " + epic1.getStatus());
         System.out.println("Подзадача 1 эпика 1\n" + taskManager.getSubtask(idSubtask1)
-                + "\nСтатус " + taskManager.getSubtaskStatus(idSubtask1));
+                + "\nСтатус " + subtask1.getStatus());
         System.out.println("Подзадача 2 эпика 1\n" + taskManager.getSubtask(idSubtask2)
-                + "\nСтатус " + taskManager.getSubtaskStatus(idSubtask2));
-        System.out.println("Эпик 2\n" + taskManager.getEpic(idEpic2));
+                + "\nСтатус " + subtask2.getStatus());
+        System.out.println("Эпик 2\n" + taskManager.getEpic(idEpic2)
+                + "\nСтатус " + epic2.getStatus());
         System.out.println("Подзадача 1 эпика 2\n" + taskManager.getSubtask(idSubtask3)
-                + "\nСтатус " + taskManager.getSubtaskStatus(idSubtask3) + "\n");
+                + "\nСтатус " + subtask3.getStatus());
+        System.out.println();
 
+        task1.setStatus(Status.DONE);
+        taskManager.updateTask(task1);
 
-        taskManager.updateTask(task1, "Уборка", "Убраться дома");
+        task2.setStatus(Status.IN_PROGRESS);
+        taskManager.updateTask(task2);
 
-        taskManager.updateEpic(epic1, "Домашнее задание", "Сделать домашнее задание");
+        subtask1.setStatus(Status.DONE);
+        taskManager.updateSubtask(subtask1);
 
-        taskManager.updateSubtask(subtask1, "Алгебра", "Решить примеры");
+        subtask2.setStatus(Status.IN_PROGRESS);
+        taskManager.updateSubtask(subtask2);
 
-        taskManager.deleteSubtask(idSubtask3);
-        taskManager.deleteTask(idTask1);
-
-        taskManager.setSubtaskStatus(idSubtask2, Status.DONE);
-
-        taskManager.setTaskStatus(idTask2, Status.IN_PROGRESS);
+        taskManager.deleteSubtask(subtask3.getId());
 
         System.out.println("Задача 1\n" + taskManager.getTask(idTask1)
-                + "\nСтатус " + taskManager.getTaskStatus(idTask1));
+                + "\nСтатус " + task1.getStatus());
         System.out.println("Задача2\n" + taskManager.getTask(idTask2)
-                + "\nСтатус " + taskManager.getTaskStatus(idTask2));
+                + "\nСтатус " + task2.getStatus());
         System.out.println("Эпик 1\n" + taskManager.getEpic(idEpic1)
-                + "\nСтатус " + taskManager.getEpicStatus(idEpic1));
+                + "\nСтатус " + epic1.getStatus());
         System.out.println("Подзадача 1 эпика 1\n" + taskManager.getSubtask(idSubtask1)
-                + "\nСтатус " + taskManager.getSubtaskStatus(idSubtask1));
+                + "\nСтатус " + subtask1.getStatus());
         System.out.println("Подзадача 2 эпика 1\n" + taskManager.getSubtask(idSubtask2)
-                + "\nСтатус " + taskManager.getSubtaskStatus(idSubtask2));
-        System.out.println("Эпик 2\n" + taskManager.getEpic(idEpic2));
+                + "\nСтатус " + subtask2.getStatus());
+        System.out.println("Эпик 2\n" + taskManager.getEpic(idEpic2)
+                + "\nСтатус " + epic2.getStatus());
         System.out.println("Подзадача 1 эпика 2\n" + taskManager.getSubtask(idSubtask3)
-                + "\nСтатус " + taskManager.getSubtaskStatus(idSubtask3) + "\n");
+                + "\nСтатус " + subtask3.getStatus());
+        System.out.println();
     }
 }
 
