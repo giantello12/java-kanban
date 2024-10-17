@@ -1,18 +1,20 @@
+package ru.yandex.javacource.sevrin.schedule.task;
+
+import ru.yandex.javacource.sevrin.schedule.manager.Status;
+
 import java.util.Objects;
 
 public class Task {
-    private final String title;
-    private final String description;
-    protected final int id;
+    protected String title;
+    protected String description;
+    protected int id;
     protected Status status;
 
 
     public Task(String title, String description) {
-        TaskManager.increaseIdCounter();
         this.title = title;
         this.description = description;
         this.status = Status.NEW;
-        id = TaskManager.getIdCounter();
     }
 
     public Status getStatus() {
@@ -31,8 +33,20 @@ public class Task {
         return title;
     }
 
-    protected void setStatus(Status status) {
+    public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     @Override
@@ -54,6 +68,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task {" + "title='" + title + '\'' + " description='" + description + '\'' + " id=" + id + '}';
+        return "ru.yandex.javacource.sevrin.schedule.task.Task {" + "title='" + title + '\'' + " description='"
+                + description + '\'' + " id=" + id + '}';
     }
 }
