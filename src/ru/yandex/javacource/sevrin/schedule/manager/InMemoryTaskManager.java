@@ -200,7 +200,7 @@ public class InMemoryTaskManager implements TaskManager {
         updateEpicStatus(epic.getId());
     }
 
-    protected void updateEpicStatus(int epicId) {
+    private void updateEpicStatus(int epicId) {
         int doneCounter = 0;
         Epic epic = epics.get(epicId);
         for (Integer subtaskId : epic.getSubtasksIds()) {
