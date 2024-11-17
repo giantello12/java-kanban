@@ -4,15 +4,15 @@ import ru.yandex.javacource.sevrin.schedule.task.Epic;
 import ru.yandex.javacource.sevrin.schedule.task.Subtask;
 import ru.yandex.javacource.sevrin.schedule.task.Task;
 
-import java.util.ArrayList;
+import java.util.List;
 
  public interface TaskManager {
 
-     ArrayList<Task> getTasks();
+     List<Task> getTasks();
 
-     ArrayList<Epic> getEpics();
+     List<Epic> getEpics();
 
-     ArrayList<Subtask> getSubtasks();
+     List<Subtask> getSubtasks();
 
      void deleteAll();
 
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
      Subtask getSubtask(int id);
 
-     ArrayList<Subtask> getEpicSubtasks(int epicId);
+     List<Subtask> getEpicSubtasks(int epicId);
 
      Integer addTask(Task task);
 
@@ -48,5 +48,5 @@ import java.util.ArrayList;
 
      void deleteSubtask(int id);
 
-     void updateEpicStatus(int epicId);
+     List<Task> getHistory();
 }

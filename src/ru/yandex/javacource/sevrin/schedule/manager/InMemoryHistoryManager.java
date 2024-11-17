@@ -14,10 +14,14 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void addToHistory(Task task) {
-        if (browsingHistory.size() == 10) {
+        final int maxSizeOfHistory = 10;
+        if (task == null) {
+            return;
+        }
+        if (browsingHistory.size() == maxSizeOfHistory) {
             browsingHistory.removeFirst();
         }
-        browsingHistory.add(task);
+        browsingHistory.add(task.copy());
     }
 
     @Override

@@ -47,6 +47,12 @@ public class Task {
         this.title = title;
     }
 
+    public Task copy() {
+        Task task = new Task(this.title, this.description);
+        task.id = this.id;
+        return task;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

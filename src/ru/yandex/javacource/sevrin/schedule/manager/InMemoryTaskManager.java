@@ -7,19 +7,21 @@ import ru.yandex.javacource.sevrin.schedule.task.Task;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
     private int idCounter;
-    private final HashMap<Integer, Task> tasks;
-    private final HashMap<Integer, Epic> epics;
-    private final HashMap<Integer, Subtask> subtasks;
-    private final InMemoryHistoryManager inMemoryHistoryManager;
+    private final Map<Integer, Task> tasks;
+    private final Map<Integer, Epic> epics;
+    private final Map<Integer, Subtask> subtasks;
+    private final HistoryManager inMemoryHistoryManager;
 
     public InMemoryTaskManager() {
         this.tasks = new HashMap<>();
         this.epics = new HashMap<>();
         this.subtasks = new HashMap<>();
-        inMemoryHistoryManager = new InMemoryHistoryManager();
+        inMemoryHistoryManager = Managers.getDefaultHistory();
     }
 
     @Override
@@ -66,19 +68,22 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(int id) {
-        inMemoryHistoryManager.addToHistory(tasks.get(id));
-        return tasks.get(id);
+        final Task task = tasks.get(id);
+        inMemoryHistoryManager.addToHistory(task);
+        return task;
     }
 
     @Override
     public Epic getEpic(int id) {
-        inMemoryHistoryManager.addToHistory(tasks.get(id));
+        final Epic epic = epics.get(id);
+        inMemoryHistoryManager.addToHistory(epic);
         return epics.get(id);
     }
 
     @Override
     public Subtask getSubtask(int id) {
-        inMemoryHistoryManager.addToHistory(tasks.get(id));
+        final Subtask subtask = subtasks.get(id);
+        inMemoryHistoryManager.addToHistory(subtask);
         return subtasks.get(id);
     }
 
@@ -143,12 +148,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateEpic(Epic epic) {
-        Epic savedEpic = epics.get(epic.getId());
+        final Epic savedEpic = epics.get(epic.getId());
         if (savedEpic == null) {
             return;
         }
-        savedEpic.setTitle(epic.getTitle());
-        savedEpic.setDescription(epic.getDescription());
+        epic.setSubtaskIds(savedEpic.getSubtaskIds());
+        epic.setStatus(savedEpic.getStatus());
+        epics.put(epic.getId(), epic);
     }
 
     @Override
@@ -194,8 +200,7 @@ public class InMemoryTaskManager implements TaskManager {
         updateEpicStatus(epic.getId());
     }
 
-    @Override
-    public void updateEpicStatus(int epicId) {
+    protected void updateEpicStatus(int epicId) {
         int doneCounter = 0;
         Epic epic = epics.get(epicId);
         for (Integer subtaskId : epic.getSubtasksIds()) {
@@ -213,5 +218,8 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             epic.setStatus(Status.IN_PROGRESS);
         }
+    }
+    public List<Task> getHistory() {
+        return inMemoryHistoryManager.getHistory();
     }
 }
