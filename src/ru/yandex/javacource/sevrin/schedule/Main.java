@@ -1,7 +1,7 @@
 package ru.yandex.javacource.sevrin.schedule;
 
 import ru.yandex.javacource.sevrin.schedule.task.Status;
-import ru.yandex.javacource.sevrin.schedule.manager.TaskManager;
+import ru.yandex.javacource.sevrin.schedule.manager.InMemoryTaskManager;
 import ru.yandex.javacource.sevrin.schedule.task.Epic;
 import ru.yandex.javacource.sevrin.schedule.task.Subtask;
 import ru.yandex.javacource.sevrin.schedule.task.Task;
@@ -10,7 +10,7 @@ import ru.yandex.javacource.sevrin.schedule.task.Task;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
 
         Task task1 = new Task("Домашнее задание 1", "Сделать домашнее заданее 1");
         int idTask1 = taskManager.addTask(task1);
@@ -77,4 +77,3 @@ public class Main {
         System.out.println();
     }
 }
-
