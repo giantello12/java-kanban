@@ -7,6 +7,7 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final List<Task> browsingHistory;
+    final int MAX_SIZE = 10;
 
     public InMemoryHistoryManager() {
         this.browsingHistory = new ArrayList<>();
@@ -14,11 +15,11 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void addToHistory(Task task) {
-        final int maxSizeOfHistory = 10;
+
         if (task == null) {
             return;
         }
-        if (browsingHistory.size() == maxSizeOfHistory) {
+        if (browsingHistory.size() == MAX_SIZE) {
             browsingHistory.removeFirst();
         }
         browsingHistory.add(task.copy());

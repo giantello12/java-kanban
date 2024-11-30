@@ -49,6 +49,7 @@ public class Task {
 
     public Task copy() {
         Task task = new Task(this.title, this.description);
+        task.status = this.status;
         task.id = this.id;
         return task;
     }
