@@ -1,7 +1,5 @@
 package ru.yandex.javacource.sevrin.schedule;
 
-import ru.yandex.javacource.sevrin.schedule.manager.InMemoryHistoryManager;
-import ru.yandex.javacource.sevrin.schedule.task.Status;
 import ru.yandex.javacource.sevrin.schedule.manager.InMemoryTaskManager;
 import ru.yandex.javacource.sevrin.schedule.task.Epic;
 import ru.yandex.javacource.sevrin.schedule.task.Subtask;
