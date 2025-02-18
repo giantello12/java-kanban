@@ -29,10 +29,6 @@ public class Epic extends Task {
         subtaskIds.clear();
     }
 
-    public ArrayList<Integer> getSubtasksIds() {
-        return subtaskIds;
-    }
-
     @Override
     public String toString() {
         return "ru.yandex.javacource.sevrin.schedule.task.Epic {" + "title='" + getTitle() + '\'' + " description='"
