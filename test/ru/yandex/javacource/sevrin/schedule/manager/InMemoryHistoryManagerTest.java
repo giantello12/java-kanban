@@ -3,38 +3,33 @@ package ru.yandex.javacource.sevrin.schedule.manager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import ru.yandex.javacource.sevrin.schedule.task.*;
-import ru.yandex.javacource.sevrin.schedule.manager.*;
 
 class InMemoryHistoryManagerTest {
-    private HistoryManager historyManager;
     private TaskManager taskManager;
 
     @BeforeEach
     public void setUp() {
-        historyManager = new InMemoryHistoryManager();
         taskManager = new InMemoryTaskManager();
     }
 
     @Test
-    public void testAddToHistoryPreservesPreviousVersionTask() {
+    public void testAddingToHistoryReplacesPreviousVersionTask() {
         Task task = new Task("test", "test");
         taskManager.addTask(task);
         taskManager.getTask(task.getId());
-        List<Task> history = taskManager.getHistory();
         task.setTitle("changed");
         taskManager.updateTask(task);
+        taskManager.getTask(task.getId());
+        List<Task> history = taskManager.getHistory();
 
         assertEquals(1, history.size(), "Размер списка содержащего историю отличается от ожидаемого!");
-        assertEquals("test", history.getFirst().getTitle(), "Заголовок отличается от " +
-                "предыдущей версии!");
-        assertNotEquals(task.getTitle(), history.getFirst().getTitle(), "Заголовок совпадает с " +
-                "обновленной версией!"); // Убедитесь, что заголовки не совпадают
+        assertEquals("changed", history.getFirst().getTitle(), "В истории сохранена предыдущая " +
+                "версия задачи");
     }
 
     @Test
@@ -45,20 +40,67 @@ class InMemoryHistoryManagerTest {
         taskManager.addSubtask(subtask);
         taskManager.getEpic(epic.getId());
         taskManager.getSubtask(subtask.getId());
-        List<Task> history = taskManager.getHistory();
+
         epic.setTitle("changed");
         subtask.setTitle("changed");
         taskManager.updateEpic(epic);
         taskManager.updateSubtask(subtask);
 
+        taskManager.getEpic(epic.getId());
+        taskManager.getSubtask(subtask.getId());
+        List<Task> history = taskManager.getHistory();
+
         assertEquals(2, history.size(), "Размер списка содержащего историю отличается от ожидаемого!");
-        assertEquals("test", history.getFirst().getTitle(), "Заголовок эпика отличается от предыдущей " +
-                "версии!");
-        assertEquals("test", history.get(1).getTitle(), "Заголовок подзадачи отличается от предыдущей " +
-                "версии!");
-        assertNotEquals(epic.getTitle(), history.getFirst().getTitle(), "Заголовок эпика совпадает с " +
-                "обновленной версией!");
-        assertNotEquals(subtask.getTitle(), history.get(1).getTitle(), "Заголовок подзадачи совпадает с " +
-                "обновленной версией!");
+        assertEquals("changed", history.getFirst().getTitle(), "Заголовок эпика сохраняет предыдущую " +
+                "версию эпика!");
+        assertEquals("changed", history.get(1).getTitle(), "Заголовок подзадачи сохраняет предыдущую " +
+                "версию задачи!");
+    }
+
+    @Test
+    public void testAddingViewToHistoryReplacesPreviousView() {
+        Task task1 = new Task("test1", "test1");
+        taskManager.addTask(task1);
+        taskManager.getTask(task1.getId());
+        Task task2 = new Task("test2", "test2");
+        taskManager.addTask(task2);
+        taskManager.getTask(task2.getId());
+        taskManager.getTask(task1.getId());
+        List<Task> history = taskManager.getHistory();
+
+        assertEquals(2, history.size(), "Размер истории больше ожидаемого!");
+        assertEquals("test2", history.getFirst().getTitle(), "Порядок записей неверный!");
+        assertEquals("test1", history.get(1).getTitle(), "Порядок записей неверный!");
+    }
+
+    @Test
+    public void testAddingToHistoryWorksCorrect() {
+        Task task1 = new Task("test", "test");
+        List<Task> history = taskManager.getHistory();
+        int historySizeBeforeAdding = history.size();
+        taskManager.addTask(task1);
+        taskManager.getTask(task1.getId());
+        history = taskManager.getHistory();
+        int historySizeAfterAdding = history.size();
+
+        assertEquals(1, history.size(), "Размер истории отличается от ожидаемого!");
+        assertNotEquals(historySizeAfterAdding, historySizeBeforeAdding, "Размер истории не изменился после " +
+                "добавления элемента!");
+        assertEquals("test", history.getFirst().getTitle(), "Элемент в истории отличается от " +
+                "ожидаемого!");
+    }
+
+    @Test
+    public void testRemovingFromHistoryWorksCorrect() {
+        Task task1 = new Task("test", "test");
+        taskManager.addTask(task1);
+        taskManager.getTask(task1.getId());
+        List<Task> history = taskManager.getHistory();
+        int historySizeBeforeDeleting = history.size();
+        taskManager.remove(task1.getId());
+        history = taskManager.getHistory();
+        int historySizeAfterDeleting = history.size();
+        assertNotEquals(historySizeAfterDeleting, historySizeBeforeDeleting, "Размер истории до и после " +
+                "удаления элемента должен отличаться!");
     }
 }

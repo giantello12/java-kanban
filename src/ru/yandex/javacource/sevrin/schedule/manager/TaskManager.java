@@ -49,4 +49,6 @@ import java.util.List;
      void deleteSubtask(int id);
 
      List<Task> getHistory();
+
+     public void remove(int id);
 }
