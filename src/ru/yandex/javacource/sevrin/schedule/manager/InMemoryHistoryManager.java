@@ -7,16 +7,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+class Node {
+    Task task;
+    Node prev;
+    Node next;
+
+    public Node(Task task, Node prev, Node next) {
+        this.task = task;
+        this.prev = prev;
+        this.next = next;
+    }
+
+}
+
 public class InMemoryHistoryManager implements HistoryManager {
-    private final Node head;
-    private final Node tail;
+    private Node head;
+    private Node tail;
     private final Map<Integer, Node> browsingHistory;
 
     public InMemoryHistoryManager() {
-        this.head = new Node(null);
-        this.tail = new Node(null);
-        head.next = tail;
-        tail.prev = head;
+        this.head = null;
+        this.tail = null;
         this.browsingHistory = new HashMap<>();
     }
 
@@ -25,56 +36,42 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (nodeToRemove == null) {
             return;
         }
-        if (nodeToRemove.task instanceof Epic) {
-            for (Integer subtaskId : ((Epic) nodeToRemove.task).getSubtaskIds()) {
-                removeNode(browsingHistory.remove(subtaskId));
-            }
-        }
         removeNode(nodeToRemove);
     }
 
-    public void removeNode(Node node) {
-        if (node == null) {
-            return;
-        }
-
-        browsingHistory.remove(node.task.getId());
+    private void removeNode(Node node) {
 
         if (node.prev != null) {
             node.prev.next = node.next;
-        }
-        if (node.next != null) {
-            node.next.prev = node.prev;
+            if (node.next == null) {
+                tail = node.prev;
+            } else {
+                node.next.prev = node.prev;
+            }
+        } else {
+            head = node.next;
+            if (head == null) {
+                tail = null;
+            } else {
+                head.prev = null;
+            }
         }
     }
 
-    public void linkLast(Task task) {
-        Node newNode = new Node(task);
-        Node lastNode = tail.prev;
-        lastNode.next = newNode;
-        newNode.prev = lastNode;
-        newNode.next = tail;
-        tail.prev = newNode;
-
-        browsingHistory.put(task.getId(), newNode);
-    }
-
-    public void linkLast(Epic epic) {
-        Node newNode = new Node(epic);
-        Node lastNode = tail.prev;
-        lastNode.next = newNode;
-        newNode.prev = lastNode;
-        newNode.next = tail;
-        tail.prev = newNode;
-
-        browsingHistory.put(epic.getId(), newNode);
+    private void linkLast(Task task) {
+        final Node node = new Node(task, tail, null);
+        if (tail == null) {
+            head = node;
+        } else {
+            tail.next = node;
+        }
+        tail = node;
     }
 
     public List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>();
-        Node currentNode = head.next;
-
-        while (currentNode != tail) {
+        Node currentNode = head;
+        while (currentNode != null) {
             tasks.add(currentNode.task);
             currentNode = currentNode.next;
         }
@@ -83,22 +80,13 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-
         if (task == null) {
             return;
         }
-        remove(task.getId());
-        linkLast(task.copy());
-    }
-
-    @Override
-    public void add(Epic epic) {
-
-        if (epic == null) {
-            return;
-        }
-        remove(epic.getId());
-        linkLast(epic);
+        final int id = task.getId();
+        remove(id);
+        linkLast(task);
+        browsingHistory.put(id, tail);
     }
 
     @Override

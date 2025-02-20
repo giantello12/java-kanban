@@ -11,6 +11,6 @@ class ManagersTest {
         TaskManager taskManager = managers.getDefault();
 
         assertNotNull(taskManager, "Объект taskManager не создается!");
-        assertInstanceOf(InMemoryTaskManager.class, taskManager, "taskManager не экземляр InMemoryTaskManager!");
+        assertInstanceOf(InMemoryTaskManager.class, taskManager, "taskManager не экземпляр InMemoryTaskManager!");
     }
 }

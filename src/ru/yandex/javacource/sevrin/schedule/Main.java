@@ -56,8 +56,6 @@ public class Main {
         System.out.println("Просмотр эпика 1");
         System.out.println(taskManager.getHistory());
 
-        System.out.println(epic1.getSubtaskIds());
-
         taskManager.remove(idSubtask1);
         System.out.println("Удаление подзадачи 1");
         System.out.println(taskManager.getHistory());
