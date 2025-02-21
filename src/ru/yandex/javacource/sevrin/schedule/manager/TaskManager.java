@@ -6,47 +6,49 @@ import ru.yandex.javacource.sevrin.schedule.task.Task;
 
 import java.util.List;
 
- public interface TaskManager {
+public interface TaskManager {
 
-     List<Task> getTasks();
+    List<Task> getTasks();
 
-     List<Epic> getEpics();
+    List<Epic> getEpics();
 
-     List<Subtask> getSubtasks();
+    List<Subtask> getSubtasks();
 
-     void deleteAll();
+    void deleteAll();
 
-     void deleteTasks();
+    void deleteTasks();
 
-     void deleteSubtasks();
+    void deleteSubtasks();
 
-     void deleteEpics();
+    void deleteEpics();
 
-     Task getTask(int id);
+    Task getTask(int id);
 
-     Epic getEpic(int id);
+    Epic getEpic(int id);
 
-     Subtask getSubtask(int id);
+    Subtask getSubtask(int id);
 
-     List<Subtask> getEpicSubtasks(int epicId);
+    List<Subtask> getEpicSubtasks(int epicId);
 
-     Integer addTask(Task task);
+    Integer addTask(Task task);
 
-     Integer addEpic(Epic epic);
+    Integer addEpic(Epic epic);
 
-     Integer addSubtask(Subtask subtask);
+    Integer addSubtask(Subtask subtask);
 
-     void updateTask(Task task);
+    void updateTask(Task task);
 
-     void updateEpic(Epic epic);
+    void updateEpic(Epic epic);
 
-     void updateSubtask(Subtask subtask);
+    void updateSubtask(Subtask subtask);
 
-     void deleteTask(int id);
+    void deleteTask(int id);
 
-     void deleteEpic(int id);
+    void deleteEpic(int id);
 
-     void deleteSubtask(int id);
+    void deleteSubtask(int id);
 
-     List<Task> getHistory();
+    List<Task> getHistory();
+
+    public void remove(int id);
 }
