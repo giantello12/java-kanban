@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -53,10 +54,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
 
             int id = Integer.parseInt(parts[0]);
-            String type = parts[1].toUpperCase();
-            String title = parts[2];
-            Status status = Status.valueOf(parts[3]);
-            String description = parts[4];
+            String type = parts[1].toUpperCase().trim();
+            String title = parts[2].trim();
+            Status status = Status.valueOf(parts[3].trim());
+            String description = parts[4].trim();
 
             switch(type) {
                 case "TASK":
@@ -94,6 +95,48 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     task.getDescription()
             );
         }
+    }
+
+    public static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager manager = new FileBackedTaskManager(file);
+
+        try (Scanner scanner = new Scanner(file)) {
+            if (scanner.hasNextLine()) {
+                scanner.nextLine();
+            }
+
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine().trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
+
+                Task task = manager.fromString(line);
+                if (task != null) {
+                    if (task instanceof Epic) {
+                        manager.epics.put(task.getId(), (Epic) task);
+                    } else if (task instanceof Subtask) {
+                        manager.subtasks.put(task.getId(), (Subtask) task);
+                        // Добавляем подзадачу в эпик
+                        Subtask subtask = (Subtask) task;
+                        Epic epic = manager.epics.get(subtask.getEpicId());
+                        if (epic != null) {
+                            epic.addSubtaskId(subtask.getId());
+                        }
+                    } else {
+                        manager.tasks.put(task.getId(), task);
+                    }
+
+                    if (task.getId() > manager.idCounter) {
+                        manager.idCounter = task.getId();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка чтения из файла", e);
+        }
+
+        return manager;
     }
 
     public void save() {
