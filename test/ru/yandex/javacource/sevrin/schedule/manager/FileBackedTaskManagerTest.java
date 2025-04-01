@@ -3,7 +3,9 @@ package ru.yandex.javacource.sevrin.schedule.manager;
 import ru.yandex.javacource.sevrin.schedule.task.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+
 import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -15,7 +17,6 @@ class FileBackedTaskManagerTest {
     @BeforeEach
     void setUp() throws IOException {
         tempFile = File.createTempFile("tasks", ".csv");
-        assertTrue(tempFile.canWrite());
         manager = new FileBackedTaskManager(tempFile);
     }
 
