@@ -4,7 +4,6 @@ import ru.yandex.javacource.sevrin.schedule.task.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Scanner;
 
 
@@ -59,7 +58,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             Status status = Status.valueOf(parts[3].trim());
             String description = parts[4].trim();
 
-            switch(type) {
+            switch (type) {
                 case "TASK":
                     return new Task(id, title, description, status);
                 case "EPIC":

@@ -3,11 +3,9 @@ package ru.yandex.javacource.sevrin.schedule.manager;
 import ru.yandex.javacource.sevrin.schedule.task.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 
 class FileBackedTaskManagerTest {
