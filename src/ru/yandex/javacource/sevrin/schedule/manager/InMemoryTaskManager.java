@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int idCounter;
-    private final Map<Integer, Task> tasks;
-    private final Map<Integer, Epic> epics;
-    private final Map<Integer, Subtask> subtasks;
-    private final HistoryManager inMemoryHistoryManager;
+    protected int idCounter;
+    protected final Map<Integer, Task> tasks;
+    protected final Map<Integer, Epic> epics;
+    protected final Map<Integer, Subtask> subtasks;
+    protected final HistoryManager inMemoryHistoryManager;
 
     public InMemoryTaskManager() {
         this.tasks = new HashMap<>();
