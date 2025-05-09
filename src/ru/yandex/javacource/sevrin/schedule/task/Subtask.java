@@ -1,7 +1,15 @@
 package ru.yandex.javacource.sevrin.schedule.task;
 
+import java.time.LocalDateTime;
+import java.time.Duration;
+
 public class Subtask extends Task {
-    private int epicId;
+    private final int epicId;
+
+    public Subtask(String title, String description, Integer epicId, LocalDateTime startTime, Duration duration) {
+        super(title, description, startTime, duration);
+        this.epicId = epicId;
+    }
 
     public Subtask(String title, String description, Integer epicId) {
         super(title, description);

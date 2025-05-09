@@ -1,5 +1,6 @@
 package ru.yandex.javacource.sevrin.schedule;
 
+import ru.yandex.javacource.sevrin.schedule.manager.InMemoryHistoryManager;
 import ru.yandex.javacource.sevrin.schedule.manager.InMemoryTaskManager;
 import ru.yandex.javacource.sevrin.schedule.task.Epic;
 import ru.yandex.javacource.sevrin.schedule.task.Subtask;
@@ -63,6 +64,5 @@ public class Main {
         taskManager.remove(idEpic1);
         System.out.println("Удаление эпика 1");
         System.out.println(taskManager.getHistory());
-
     }
 }
