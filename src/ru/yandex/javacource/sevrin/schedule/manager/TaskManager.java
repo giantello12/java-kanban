@@ -48,6 +48,10 @@ public interface TaskManager {
 
     void deleteSubtask(int id);
 
+    boolean isIntersection(Task task1, Task task2);
+
+    boolean hasIntersections(Task task);
+
     List<Task> getHistory();
 
     public void remove(int id);

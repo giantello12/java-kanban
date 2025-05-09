@@ -5,7 +5,11 @@ import ru.yandex.javacource.sevrin.schedule.task.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Scanner;
+import java.util.List;
+import java.time.Duration;
 
 
 public class  FileBackedTaskManager extends InMemoryTaskManager {
@@ -74,7 +78,39 @@ public class  FileBackedTaskManager extends InMemoryTaskManager {
             throw new ManagerSaveException("Ошибка чтения из файла", e);
         }
 
+        for (Epic epic : manager.epics.values()) {
+            List<Subtask> subtasks = manager.getEpicSubtasks(epic.getId());
+            manager.updateEpicTime(epic.getId(), subtasks);
+        }
+
         return manager;
+    }
+
+    private void updateEpicTime(int epicId, List<Subtask> subtasks) {
+        Epic epic = epics.get(epicId);
+        if (epic == null) return;
+
+        Duration duration = subtasks.stream()
+                .map(Subtask::getDuration)
+                .filter(Objects::nonNull)
+                .reduce(Duration.ZERO, Duration::plus);
+
+        LocalDateTime startTime = subtasks.stream()
+                .map(Subtask::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+
+        LocalDateTime endTime = subtasks.stream()
+                .map(Subtask::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+
+        epic.setDuration(duration);
+        epic.setStartTime(startTime);
+        epic.setEndTime(endTime);
+
     }
 
     public void save() {

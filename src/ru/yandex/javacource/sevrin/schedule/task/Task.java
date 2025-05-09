@@ -1,18 +1,31 @@
 package ru.yandex.javacource.sevrin.schedule.task;
 
 import java.util.Objects;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Task {
     protected String title;
     protected String description;
     protected int id;
     protected Status status;
-
+    protected Duration duration;
+    protected LocalDateTime startTime;
+    protected LocalDateTime endTime;
 
     public Task(String title, String description) {
         this.title = title;
         this.description = description;
         this.status = Status.NEW;
+    }
+
+    public Task(String title, String description, LocalDateTime startTime, Duration duration) {
+        this.title = title;
+        this.description = description;
+        this.status = Status.NEW;
+        this.startTime = startTime;
+        this.duration = duration;
+        this.endTime = getEndTime();
     }
 
     public Task(int id, String title, String description, Status status) {
@@ -21,6 +34,10 @@ public class Task {
         this.description = description;
         this.status = status;
     }
+
+    public Duration getDuration() { return duration; }
+
+    public LocalDateTime getStartTime() { return startTime; }
 
     public Status getStatus() {
         return status;
@@ -54,11 +71,14 @@ public class Task {
         this.title = title;
     }
 
-    public Task copy() {
-        Task task = new Task(this.title, this.description);
-        task.status = this.status;
-        task.id = this.id;
-        return task;
+    public void setDuration(Duration duration) { this.duration = duration; }
+
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
+
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 
     @Override

@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 class FileBackedTaskManagerTest {
     private File tempFile;
@@ -37,8 +39,12 @@ class FileBackedTaskManagerTest {
     @Test
     void shouldSaveMultipleTasks() {
         try {
-            Task task1 = new Task("Task 1", "Description 1");
-            Task task2 = new Task("Task 2", "Description 2");
+            Duration duration1 = Duration.ofHours(2);
+            Duration duration2 = Duration.ofHours(3);
+            LocalDateTime date1 = LocalDateTime.of(2024, 10, 10, 2, 1);
+            LocalDateTime date2 = LocalDateTime.of(2023, 10, 10, 2, 1);
+            Task task1 = new Task("Task 1", "Description 1", date1, duration1);
+            Task task2 = new Task("Task 2", "Description 2", date2, duration2);
 
             manager.addTask(task1);
             manager.addTask(task2);
@@ -56,8 +62,12 @@ class FileBackedTaskManagerTest {
     @Test
     void shouldLoadMultipleTasks() {
         try {
-            Task task1 = new Task("Task 1", "Description 1");
-            Task task2 = new Task("Task 2", "Description 2");
+            Duration duration1 = Duration.ofHours(2);
+            Duration duration2 = Duration.ofHours(3);
+            LocalDateTime date1 = LocalDateTime.of(2024, 10, 10, 2, 1);
+            LocalDateTime date2 = LocalDateTime.of(2023, 10, 10, 2, 1);
+            Task task1 = new Task("Task 1", "Description 1", date1, duration1);
+            Task task2 = new Task("Task 2", "Description 2", date2, duration2);
             manager.addTask(task1);
             manager.addTask(task2);
 
