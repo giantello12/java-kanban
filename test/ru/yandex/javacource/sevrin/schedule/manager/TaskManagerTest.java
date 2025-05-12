@@ -9,8 +9,6 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public abstract class TaskManagerTest<T extends TaskManager> {
     protected T taskManager;
 

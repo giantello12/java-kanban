@@ -12,8 +12,6 @@ import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import ru.yandex.javacource.sevrin.schedule.manager.*;
-
 class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private File tempFile;
     private FileBackedTaskManager taskManager;
