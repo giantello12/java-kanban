@@ -141,8 +141,8 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
         }
         List<Subtask> epicSubtasks = getEpicSubtasks(epic.getId());
-        boolean subtaskHasIntersections = epicSubtasks.stream().
-                anyMatch(existingSubtask -> isIntersection(subtask, existingSubtask));
+        boolean subtaskHasIntersections = epicSubtasks.stream()
+                .anyMatch(existingSubtask -> isIntersection(subtask, existingSubtask));
         if (subtaskHasIntersections) {
             throw new ManagerTimeException("Подзадача пересекается с другими подзадачами!");
         }
