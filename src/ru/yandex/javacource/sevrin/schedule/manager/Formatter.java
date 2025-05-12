@@ -31,7 +31,12 @@ public class Formatter {
 
             switch (type) {
                 case "TASK":
-                    Task task = new Task(title, description, startTime, duration);
+                    Task task;
+                    if (duration != null && startTime != null && endTime != null) {
+                        task = new Task(title, description, startTime, duration);
+                    } else {
+                        task = new Task(title, description);
+                    }
                     task.setId(id);
                     task.setStatus(status);
                     return task;
@@ -40,14 +45,25 @@ public class Formatter {
                     Epic epic = new Epic(title, description);
                     epic.setId(id);
                     epic.setStatus(status);
-                    epic.setDuration(duration);
-                    epic.setStartTime(startTime);
-                    epic.setEndTime(endTime);
+                    if (duration != null) {
+                        epic.setDuration(duration);
+                    }
+                    if (startTime != null) {
+                        epic.setStartTime(startTime);
+                    }
+                    if (endTime != null) {
+                        epic.setEndTime(endTime);
+                    }
                     return epic;
 
                 case "SUBTASK":
+                    Subtask subtask;
                     int epicId = Integer.parseInt(parts[8].trim());
-                    Subtask subtask = new Subtask(title, description, startTime, duration, epicId);
+                    if (duration != null && startTime != null && endTime != null) {
+                        subtask = new Subtask(title, description, startTime, duration, epicId);
+                    } else {
+                        subtask = new Subtask(title, description, epicId);
+                    }
                     subtask.setId(id);
                     subtask.setStatus(status);
                     return subtask;

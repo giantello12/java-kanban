@@ -12,7 +12,7 @@ import java.util.List;
 import java.time.Duration;
 
 
-public class  FileBackedTaskManager extends InMemoryTaskManager {
+public class FileBackedTaskManager extends InMemoryTaskManager {
     File file;
 
     public FileBackedTaskManager(File file) {
@@ -50,38 +50,35 @@ public class  FileBackedTaskManager extends InMemoryTaskManager {
 
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
-                if (line.isEmpty()) {
-                    continue;
-                }
+                if (line.isEmpty()) continue;
 
                 Task task = Formatter.fromString(line);
-                if (task != null) {
-                    if (task instanceof Epic) {
-                        manager.epics.put(task.getId(), (Epic) task);
-                    } else if (task instanceof Subtask) {
-                        manager.subtasks.put(task.getId(), (Subtask) task);
-                        Subtask subtask = (Subtask) task;
-                        Epic epic = manager.epics.get(subtask.getEpicId());
-                        if (epic != null) {
-                            epic.addSubtaskId(subtask.getId());
-                        }
-                    } else {
-                        manager.tasks.put(task.getId(), task);
-                    }
+                if (task == null) continue;
 
-                    if (task.getId() > manager.idCounter) {
-                        manager.idCounter = task.getId();
-                    }
+                if (task instanceof Epic epic) {
+                    manager.epics.put(epic.getId(), epic);
+                } else if (task instanceof Subtask subtask) {
+                    manager.subtasks.put(subtask.getId(), subtask);
+                } else {
+                    manager.tasks.put(task.getId(), task);
+                }
+
+                if (task.getId() >= manager.idCounter) {
+                    manager.idCounter = task.getId() + 1;
+                }
+
+                if (task.getStartTime() != null) {
+                    manager.prioritizedTasks.add(task);
                 }
             }
+
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка чтения из файла", e);
+            throw new ManagerSaveException("Ошибка чтения файла", e);
         }
 
-        for (Epic epic : manager.epics.values()) {
-            List<Subtask> subtasks = manager.getEpicSubtasks(epic.getId());
-            manager.updateEpicTime(epic.getId(), subtasks);
-        }
+        manager.epics.values().stream()
+                .map(epic -> manager.getEpicSubtasks(epic.getId()))
+                .forEach(subtasks -> manager.updateEpicTime(subtasks.getFirst().getEpicId(), subtasks));
 
         return manager;
     }
@@ -116,15 +113,35 @@ public class  FileBackedTaskManager extends InMemoryTaskManager {
     public void save() {
         try (FileWriter writer = new FileWriter(file)) {
             writer.write("id,type,name,status,description,epic\n");
-            for (Task task : getTasks()) {
-                writer.write(Formatter.toString(task) + "\n");
-            }
-            for (Epic epic : getEpics()) {
-                writer.write(Formatter.toString(epic) + "\n");
-            }
-            for (Subtask subtask : getSubtasks()) {
-                writer.write(Formatter.toString(subtask) + "\n");
-            }
+            getTasks().stream()
+                    .map(Formatter::toString)
+                    .forEach(taskStr -> {
+                        try {
+                            writer.write(taskStr + "\n");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+            getEpics().stream()
+                    .map(Formatter::toString)
+                    .forEach(epicStr -> {
+                        try {
+                            writer.write(epicStr + "\n");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+            getSubtasks().stream()
+                    .map(Formatter::toString)
+                    .forEach(subtaskStr -> {
+                        try {
+                            writer.write(subtaskStr + "\n");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
 
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка записи в файл", e);

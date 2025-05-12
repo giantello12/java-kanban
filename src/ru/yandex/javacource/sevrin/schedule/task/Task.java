@@ -35,9 +35,13 @@ public class Task {
         this.status = status;
     }
 
-    public Duration getDuration() { return duration; }
+    public Duration getDuration() {
+        return duration;
+    }
 
-    public LocalDateTime getStartTime() { return startTime; }
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
 
     public Status getStatus() {
         return status;
@@ -71,13 +75,22 @@ public class Task {
         this.title = title;
     }
 
-    public void setDuration(Duration duration) { this.duration = duration; }
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
 
-    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
 
-    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
 
     public LocalDateTime getEndTime() {
+        if (startTime == null || duration == null) {
+            return null;
+        }
         return startTime.plus(duration);
     }
 

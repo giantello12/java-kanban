@@ -59,10 +59,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubtasks() {
-        for (Epic epic : epics.values()) {
-            epic.cleanSubtaskIds();
-            updateEpicStatus(epic.getId());
-        }
+        epics.values().stream()
+                .peek(Epic::cleanSubtaskIds)
+                .forEach(epic -> updateEpicStatus(epic.getId()));
         subtasks.clear();
     }
 
@@ -122,10 +121,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Integer addEpic(Epic epic) {
-        for (Integer subtaskId : epic.getSubtaskIds()) {
-            if (epic.getId() == subtaskId) {
-                return null;
-            }
+        if (epic.getSubtaskIds().stream().anyMatch(subtaskId -> epic.getId() == subtaskId)) {
+            return null;
         }
         int id = ++idCounter;
         epic.setId(id);
@@ -244,9 +241,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             return;
         }
-        for (Integer subtaskId : epic.getSubtaskIds()) {
-            subtasks.remove(subtaskId);
-        }
+        epic.getSubtaskIds().forEach(subtasks::remove);
     }
 
     @Override
@@ -261,23 +256,29 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void updateEpicStatus(int epicId) {
-        int doneCounter = 0;
         Epic epic = epics.get(epicId);
-        for (Integer subtaskId : epic.getSubtaskIds()) {
-            if (subtasks.get(subtaskId).getStatus() == Status.DONE) {
-                doneCounter++;
-            }
-        }
+        long doneCounter = epic.getSubtaskIds().stream()
+                .filter(subtaskId -> subtasks.get(subtaskId).getStatus() == Status.DONE)
+                .count();
+
+        long inProgressCounter = epic.getSubtaskIds().stream()
+                .filter(subtaskId -> subtasks.get(subtaskId).getStatus() == Status.IN_PROGRESS)
+                .count();
 
         int numberOfSubtasks = epic.getSubtaskIds().size();
 
-        if (doneCounter == numberOfSubtasks && numberOfSubtasks != 0) {
-            epic.setStatus(Status.DONE);
-        } else if (doneCounter == 0) {
-            epic.setStatus(Status.NEW);
+        if (numberOfSubtasks != 0) {
+            if (doneCounter == numberOfSubtasks) {
+                epic.setStatus(Status.DONE);
+            } else if (inProgressCounter > 0 || doneCounter > 0) {
+                epic.setStatus(Status.IN_PROGRESS);
+            } else {
+                epic.setStatus(Status.NEW);
+            }
         } else {
-            epic.setStatus(Status.IN_PROGRESS);
+            epic.setStatus(Status.NEW);
         }
+
     }
 
     public void remove(int id) {

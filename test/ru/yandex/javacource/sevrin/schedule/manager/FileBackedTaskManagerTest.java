@@ -12,20 +12,28 @@ import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-class FileBackedTaskManagerTest {
+import ru.yandex.javacource.sevrin.schedule.manager.*;
+
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private File tempFile;
-    private FileBackedTaskManager manager;
+    private FileBackedTaskManager taskManager;
+
+    @Override
+    protected FileBackedTaskManager createTaskManager() {
+        return FileBackedTaskManager.loadFromFile(tempFile);
+    }
 
     @BeforeEach
     void setUp() throws IOException {
         tempFile = File.createTempFile("tasks", ".csv");
-        manager = new FileBackedTaskManager(tempFile);
+        super.setUp();
+        taskManager = createTaskManager();
     }
 
     @Test
     void shouldSaveAndLoadEmptyManager() {
         try {
-            manager.save();
+            taskManager.save();
             FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
 
             assertTrue(loadedManager.getTasks().isEmpty());
@@ -46,14 +54,14 @@ class FileBackedTaskManagerTest {
             Task task1 = new Task("Task 1", "Description 1", date1, duration1);
             Task task2 = new Task("Task 2", "Description 2", date2, duration2);
 
-            manager.addTask(task1);
-            manager.addTask(task2);
+            taskManager.addTask(task1);
+            taskManager.addTask(task2);
 
-            List<Task> tasks = manager.getTasks();
+            List<Task> tasks = taskManager.getTasks();
             assertEquals(2, tasks.size());
 
-            assertEquals("Task 1", manager.getTask(task1.getId()).getTitle());
-            assertEquals("Task 2", manager.getTask(task2.getId()).getTitle());
+            assertEquals("Task 1", taskManager.getTask(task1.getId()).getTitle());
+            assertEquals("Task 2", taskManager.getTask(task2.getId()).getTitle());
         } catch (Exception e) {
             fail("Test execution failed: " + e.getMessage());
         }
@@ -68,10 +76,10 @@ class FileBackedTaskManagerTest {
             LocalDateTime date2 = LocalDateTime.of(2023, 10, 10, 2, 1);
             Task task1 = new Task("Task 1", "Description 1", date1, duration1);
             Task task2 = new Task("Task 2", "Description 2", date2, duration2);
-            manager.addTask(task1);
-            manager.addTask(task2);
+            taskManager.addTask(task1);
+            taskManager.addTask(task2);
 
-            manager.save();
+            taskManager.save();
 
             FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
 
