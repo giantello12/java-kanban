@@ -39,10 +39,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public List<Task> getPrioritizedTasks() {
-        return new ArrayList<>(prioritizedTasks).stream()
-                .filter(task -> task.getStartTime() != null)
-                .sorted(Comparator.comparing(Task::getStartTime))
-                .toList();
+        return new ArrayList<>(prioritizedTasks);
     }
 
     @Override
@@ -59,9 +56,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubtasks() {
-        epics.values().stream()
-                .peek(Epic::cleanSubtaskIds)
-                .forEach(epic -> updateEpicStatus(epic.getId()));
+        epics.values().forEach(epic -> {
+            epic.cleanSubtaskIds();
+            updateEpicStatus(epic.getId());
+        });
         subtasks.clear();
     }
 
@@ -107,9 +105,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Integer addTask(Task task) {
-        if (hasIntersections(task)) {
-            throw new ManagerTimeException("Задача пересекает время существующей!");
-        }
+        checkIntersections(task);
         int id = ++idCounter;
         task.setId(id);
         tasks.put(id, task);
@@ -132,9 +128,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Integer addSubtask(Subtask subtask) {
-        if (hasIntersections(subtask)) {
-            throw new ManagerTimeException("Подзадача пересекается с другими задачами!");
-        }
+        checkIntersections(subtask);
         int epicId = subtask.getEpicId();
         Epic epic = epics.get(epicId);
         if (epic == null || subtask.getId() == subtask.getEpicId()) {
@@ -197,14 +191,18 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public boolean hasIntersections(Task task) {
-        if (task.getStartTime() == null || task.getDuration() == null) {
-            return false;
-        }
-
-        return getPrioritizedTasks().stream()
-                .filter(t -> t.getId() != task.getId())
-                .anyMatch(t -> isIntersection(task, t));
+    public void checkIntersections(Task task) throws ManagerTimeException {
+        getPrioritizedTasks().stream()
+                .filter(existingTask ->
+                existingTask.getId() != task.getId() &&
+                        existingTask.getStartTime() != null &&
+                        existingTask.getDuration() != null)
+                .filter(existingTask -> isIntersection(task, existingTask))
+                .findAny()
+                .ifPresent(conflictingTask -> {
+                    throw new ManagerTimeException("Задача " + task.getTitle() + "пересекается по времени с задачей "
+                            + conflictingTask.getTitle());
+                });
     }
 
     @Override

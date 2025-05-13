@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.javacource.sevrin.schedule.task.*;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +24,6 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         super.setUp();
         taskManager = new InMemoryTaskManager();
     }
-
 
     @Test
     public void shouldBeEqualTasksIfEqualTaskId() {
@@ -50,6 +51,20 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         Integer result = taskManager.addSubtask(subtask);
 
         assertNull(result, "Subtask можно добавить в качестве эпика!");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenIntersection() {
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
+
+        Task task1 = new Task("Task 1", "Description",
+                LocalDateTime.of(2025, 5, 10, 10, 0), Duration.ofHours(2));
+        Task task2 = new Task("Task 2", "Description",
+                LocalDateTime.of(2025, 5, 10, 10, 0), Duration.ofHours(1));
+
+        taskManager.addTask(task1);
+        assertThrows(ManagerTimeException.class, () -> taskManager.addTask(task2),
+                "Должно быть выброшено исключение при пересечении времени задач");
     }
 
 }

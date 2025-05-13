@@ -51,9 +51,6 @@ public class Formatter {
                     if (startTime != null) {
                         epic.setStartTime(startTime);
                     }
-                    if (endTime != null) {
-                        epic.setEndTime(endTime);
-                    }
                     return epic;
 
                 case "SUBTASK":

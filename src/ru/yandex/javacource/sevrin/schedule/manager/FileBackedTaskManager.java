@@ -22,6 +22,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public Integer addSubtask(Subtask subtask) {
         int id = super.addSubtask(subtask);
+        checkIntersections(subtask);
         save();
         return id;
     }
@@ -29,6 +30,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public Integer addTask(Task task) {
         int id = super.addTask(task);
+        checkIntersections(task);
         save();
         return id;
     }
@@ -106,8 +108,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         epic.setDuration(duration);
         epic.setStartTime(startTime);
-        epic.setEndTime(endTime);
-
     }
 
     public void save() {
