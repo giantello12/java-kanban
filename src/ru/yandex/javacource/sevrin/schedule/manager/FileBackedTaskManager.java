@@ -5,7 +5,11 @@ import ru.yandex.javacource.sevrin.schedule.task.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Scanner;
+import java.util.List;
+import java.time.Duration;
 
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -18,6 +22,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public Integer addSubtask(Subtask subtask) {
         int id = super.addSubtask(subtask);
+        checkIntersections(subtask);
         save();
         return id;
     }
@@ -25,6 +30,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public Integer addTask(Task task) {
         int id = super.addTask(task);
+        checkIntersections(task);
         save();
         return id;
     }
@@ -46,49 +52,96 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
-                if (line.isEmpty()) {
-                    continue;
-                }
+                if (line.isEmpty()) continue;
 
                 Task task = Formatter.fromString(line);
-                if (task != null) {
-                    if (task instanceof Epic) {
-                        manager.epics.put(task.getId(), (Epic) task);
-                    } else if (task instanceof Subtask) {
-                        manager.subtasks.put(task.getId(), (Subtask) task);
-                        Subtask subtask = (Subtask) task;
-                        Epic epic = manager.epics.get(subtask.getEpicId());
-                        if (epic != null) {
-                            epic.addSubtaskId(subtask.getId());
-                        }
-                    } else {
-                        manager.tasks.put(task.getId(), task);
-                    }
+                if (task == null) continue;
 
-                    if (task.getId() > manager.idCounter) {
-                        manager.idCounter = task.getId();
-                    }
+                if (task instanceof Epic epic) {
+                    manager.epics.put(epic.getId(), epic);
+                } else if (task instanceof Subtask subtask) {
+                    manager.subtasks.put(subtask.getId(), subtask);
+                } else {
+                    manager.tasks.put(task.getId(), task);
+                }
+
+                if (task.getId() >= manager.idCounter) {
+                    manager.idCounter = task.getId() + 1;
+                }
+
+                if (task.getStartTime() != null) {
+                    manager.prioritizedTasks.add(task);
                 }
             }
+
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка чтения из файла", e);
+            throw new ManagerSaveException("Ошибка чтения файла", e);
         }
 
+        manager.epics.values().stream()
+                .map(epic -> manager.getEpicSubtasks(epic.getId()))
+                .forEach(subtasks -> manager.updateEpicTime(subtasks.getFirst().getEpicId(), subtasks));
+
         return manager;
+    }
+
+    private void updateEpicTime(int epicId, List<Subtask> subtasks) {
+        Epic epic = epics.get(epicId);
+        if (epic == null) return;
+
+        Duration duration = subtasks.stream()
+                .map(Subtask::getDuration)
+                .filter(Objects::nonNull)
+                .reduce(Duration.ZERO, Duration::plus);
+
+        LocalDateTime startTime = subtasks.stream()
+                .map(Subtask::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+
+        LocalDateTime endTime = subtasks.stream()
+                .map(Subtask::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+
+        epic.setDuration(duration);
+        epic.setStartTime(startTime);
     }
 
     public void save() {
         try (FileWriter writer = new FileWriter(file)) {
             writer.write("id,type,name,status,description,epic\n");
-            for (Task task : getTasks()) {
-                writer.write(Formatter.toString(task) + "\n");
-            }
-            for (Epic epic : getEpics()) {
-                writer.write(Formatter.toString(epic) + "\n");
-            }
-            for (Subtask subtask : getSubtasks()) {
-                writer.write(Formatter.toString(subtask) + "\n");
-            }
+            getTasks().stream()
+                    .map(Formatter::toString)
+                    .forEach(taskStr -> {
+                        try {
+                            writer.write(taskStr + "\n");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+            getEpics().stream()
+                    .map(Formatter::toString)
+                    .forEach(epicStr -> {
+                        try {
+                            writer.write(epicStr + "\n");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+            getSubtasks().stream()
+                    .map(Formatter::toString)
+                    .forEach(subtaskStr -> {
+                        try {
+                            writer.write(subtaskStr + "\n");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
 
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка записи в файл", e);

@@ -31,6 +31,58 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
+    public void testEmptyHistory() {
+        List<Task> history = taskManager.getHistory();
+        assertTrue(history.isEmpty(), "История должна быть пустой!");
+    }
+
+    @Test
+    public void testDuplicationInHistory() {
+        Task task1 = new Task("test1", "test1");
+        taskManager.addTask(task1);
+        taskManager.getTask(task1.getId());
+        Task task2 = new Task("test2", "test2");
+        taskManager.addTask(task2);
+        taskManager.getTask(task2.getId());
+        taskManager.getTask(task1.getId()); // дублируем доступ к task1
+
+        List<Task> history = taskManager.getHistory();
+        assertEquals(2, history.size(), "История не должна содержать дубликатов!");
+        assertTrue(history.contains(task1), "История должна содержать task1!");
+        assertTrue(history.contains(task2), "История должна содержать task2!");
+    }
+
+    @Test
+    public void testRemovingFromHistoryEdgeCases() {
+        Task task1 = new Task("test1", "test1");
+        Task task2 = new Task("test2", "test2");
+        Task task3 = new Task("test3", "test3");
+
+        taskManager.addTask(task1);
+        taskManager.getTask(task1.getId());
+        taskManager.addTask(task2);
+        taskManager.getTask(task2.getId());
+        taskManager.addTask(task3);
+        taskManager.getTask(task3.getId());
+
+        taskManager.remove(task1.getId());
+        List<Task> history = taskManager.getHistory();
+        assertEquals(2, history.size(), "История должна содержать 2 элемента после удаления из начала!");
+        assertFalse(history.contains(task1), "История не должна содержать удаленный task1!");
+
+        taskManager.remove(task2.getId());
+        history = taskManager.getHistory();
+        System.out.println(history.size());
+        assertEquals(1, history.size(), "История должна содержать 1 элемент после удаления из середины!");
+        assertFalse(history.contains(task2), "История не должна содержать удаленный task2!");
+
+        taskManager.getTask(task3.getId());
+        taskManager.remove(task3.getId());
+        history = taskManager.getHistory();
+        assertTrue(history.isEmpty(), "История должна быть пустой после удаления последнего элемента!");
+    }
+
+    @Test
     public void testAddToHistoryPreservesPreviousVersionEpicAndSubtask() {
         Epic epic = new Epic("test", "test");
         taskManager.addEpic(epic);

@@ -63,6 +63,5 @@ public class Main {
         taskManager.remove(idEpic1);
         System.out.println("Удаление эпика 1");
         System.out.println(taskManager.getHistory());
-
     }
 }
