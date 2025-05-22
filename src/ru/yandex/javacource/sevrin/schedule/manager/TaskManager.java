@@ -55,4 +55,6 @@ public interface TaskManager {
     List<Task> getHistory();
 
     public void remove(int id);
+
+    List<Task> getPrioritizedTasks();
 }
