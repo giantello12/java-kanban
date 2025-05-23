@@ -107,15 +107,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Integer addTask(Task task) {
         checkIntersections(task);
-        int id = ++idCounter;
-        task.setId(id);
-        tasks.put(id, task);
+        task.setId(++idCounter);
+        tasks.put(task.getId(), task);
         if (task.getStartTime() != null) {
             prioritizedTasks.add(task);
         }
-        return id;
+        return task.getId();
     }
-
     @Override
     public Integer addEpic(Epic epic) {
         if (epic.getSubtaskIds().stream().anyMatch(subtaskId -> epic.getId() == subtaskId)) {
@@ -192,18 +190,20 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void checkIntersections(Task task) throws ManagerTimeException {
-        getPrioritizedTasks().stream()
-                .filter(existingTask ->
-                existingTask.getId() != task.getId() &&
-                        existingTask.getStartTime() != null &&
-                        existingTask.getDuration() != null)
-                .filter(existingTask -> isIntersection(task, existingTask))
-                .findAny()
-                .ifPresent(conflictingTask -> {
-                    throw new ManagerTimeException("Задача " + task.getTitle() + "пересекается по времени с задачей "
-                            + conflictingTask.getTitle());
-                });
+    public void checkIntersections(Task newTask) {
+        if (newTask.getStartTime() == null || newTask.getDuration() == null) return;
+
+        LocalDateTime newStart = newTask.getStartTime();
+        LocalDateTime newEnd = newStart.plus(newTask.getDuration());
+
+        for (Task existing : prioritizedTasks) {
+            LocalDateTime existingStart = existing.getStartTime();
+            LocalDateTime existingEnd = existingStart.plus(existing.getDuration());
+
+            if (newStart.isBefore(existingEnd) && existingStart.isBefore(newEnd)) {
+                throw new ManagerTimeException("Обнаружено пересечение с задачей " + existing.getTitle());
+            }
+        }
     }
 
     @Override

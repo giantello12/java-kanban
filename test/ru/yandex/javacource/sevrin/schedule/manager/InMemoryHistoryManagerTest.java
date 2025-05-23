@@ -44,7 +44,7 @@ class InMemoryHistoryManagerTest {
         Task task2 = new Task("test2", "test2");
         taskManager.addTask(task2);
         taskManager.getTask(task2.getId());
-        taskManager.getTask(task1.getId()); // дублируем доступ к task1
+        taskManager.getTask(task1.getId());
 
         List<Task> history = taskManager.getHistory();
         assertEquals(2, history.size(), "История не должна содержать дубликатов!");

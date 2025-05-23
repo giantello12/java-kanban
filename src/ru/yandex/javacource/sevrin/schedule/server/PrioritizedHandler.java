@@ -16,19 +16,15 @@ public class PrioritizedHandler extends BaseHttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
-            // Проверяем метод запроса
             if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
                 exchange.sendResponseHeaders(405, -1);
                 return;
             }
 
-            // Получаем отсортированный список задач
             List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
 
-            // Сериализуем в JSON
             String jsonResponse = gson.toJson(prioritizedTasks);
 
-            // Отправляем успешный ответ
             sendText(exchange, jsonResponse);
 
         } catch (Exception e) {

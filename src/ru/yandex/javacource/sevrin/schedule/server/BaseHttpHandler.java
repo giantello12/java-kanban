@@ -12,6 +12,8 @@ import java.io.OutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
 
 public abstract class BaseHttpHandler implements HttpHandler {
     protected final Gson gson = Managers.getGson();
@@ -58,6 +60,52 @@ public abstract class BaseHttpHandler implements HttpHandler {
     protected String readRequest(HttpExchange exchange) throws IOException {
         try (InputStream input = exchange.getRequestBody()) {
             return new String(input.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
+    protected void sendInternalError(HttpExchange exchange) throws IOException {
+        exchange.sendResponseHeaders(500, -1);
+        exchange.close();
+    }
+
+    protected int extractId(HttpExchange exchange) {
+        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        return Integer.parseInt(pathParts[2]);
+    }
+
+    protected void sendCreated(HttpExchange exchange, int id) throws IOException {
+        String response = gson.toJson(Map.of("id", id));
+        sendText(exchange, response, 201);
+    }
+
+
+    protected void sendBadRequest(HttpExchange exchange, String message) throws IOException {
+        sendText(exchange, gson.toJson(Map.of("error", message)), 400);
+    }
+
+    protected void sendMethodNotAllowed(HttpExchange exchange) throws IOException {
+        exchange.sendResponseHeaders(405, -1);
+        exchange.close();
+    }
+
+    protected void sendNoContent(HttpExchange exchange) throws IOException {
+        exchange.sendResponseHeaders(201, -1);
+        exchange.close();
+    }
+
+    protected List<String> splitPath(HttpExchange exchange) {
+        return Arrays.asList(exchange.getRequestURI().getPath().split("/"));
+    }
+
+    protected boolean isPathIdValid(List<String> pathParts, int expectedParts) {
+        if (pathParts.size() != expectedParts) {
+            return false;
+        }
+        try {
+            Integer.parseInt(pathParts.get(expectedParts - 1));
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 }

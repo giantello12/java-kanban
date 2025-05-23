@@ -5,7 +5,6 @@ import ru.yandex.javacource.sevrin.schedule.manager.Managers;
 import ru.yandex.javacource.sevrin.schedule.manager.TaskManager;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
 public class HttpTaskServer {
@@ -13,15 +12,22 @@ public class HttpTaskServer {
     private final HttpServer server;
     private final TaskManager taskManager;
 
-    public HttpTaskServer() throws IOException {
-        this.taskManager = Managers.getDefault();
+    public HttpTaskServer(TaskManager manager) throws IOException {
+        this.taskManager = manager;
         this.server = HttpServer.create(new InetSocketAddress(PORT), 0);
         configureServer();
     }
 
+    public TaskManager getTaskManager() {
+        return taskManager;
+    }
+
     private void configureServer() {
-        // Базовые обработчики (пока заглушки)
-        server.createContext();
+        server.createContext("/tasks", new TasksHandler(taskManager));
+        server.createContext("/subtasks", new SubtasksHandler(taskManager));
+        server.createContext("/epics", new EpicsHandler(taskManager));
+        server.createContext("/history", new HistoryHandler(taskManager));
+        server.createContext("/prioritized", new PrioritizedHandler(taskManager));
     }
 
     public void start() {
@@ -36,9 +42,9 @@ public class HttpTaskServer {
 
     public static void main(String[] args) {
         try {
-            HttpTaskServer taskServer = new HttpTaskServer();
+            TaskManager manager = Managers.getDefault();
+            HttpTaskServer taskServer = new HttpTaskServer(manager);
             taskServer.start();
-
         } catch (IOException e) {
             System.err.println("Failed to start server: " + e.getMessage());
         }
