@@ -1,6 +1,5 @@
 package ru.yandex.javacource.sevrin.schedule.server;
 
-import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 
 import ru.yandex.javacource.sevrin.schedule.task.*;
@@ -8,7 +7,6 @@ import ru.yandex.javacource.sevrin.schedule.exceptions.*;
 import ru.yandex.javacource.sevrin.schedule.manager.*;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.List;
 
 public class TasksHandler extends BaseHttpHandler {
