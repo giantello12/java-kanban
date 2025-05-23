@@ -114,6 +114,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return task.getId();
     }
+
     @Override
     public Integer addEpic(Epic epic) {
         if (epic.getSubtaskIds().stream().anyMatch(subtaskId -> epic.getId() == subtaskId)) {
